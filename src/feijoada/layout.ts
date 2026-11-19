@@ -29,16 +29,16 @@ export type Layout = {
 
 export const LAYOUTS: Record<Variant, Layout> = {
   stories: {
-    logo: { top: 284, size: 168 },
-    block: { dx: 10, dy: 214, scale: 1 },
+    logo: { top: 280, size: 290 },
+    block: { dx: 10, dy: 334, scale: 1 },
     tag: { left: 84, top: 1258, scale: 1 },
-    bowl: { dx: 40, dy: 200 },
+    bowl: { dx: 40, dy: 300 },
   },
   reels: {
-    logo: { top: 280, size: 148 },
-    block: { dx: 4, dy: 190, scale: 0.88 },
-    tag: { left: 82, top: 1004, scale: 0.86 },
-    bowl: { dx: 40, dy: 150 },
+    logo: { top: 276, size: 236 },
+    block: { dx: 8, dy: 276, scale: 0.8 },
+    tag: { left: 84, top: 1026, scale: 0.78 },
+    bowl: { dx: 40, dy: 220 },
   },
 };
 

@@ -111,7 +111,12 @@ ccx, ccy = (cx - box[0]) * k, (cy - box[1]) * k
 d = np.sqrt((xx - ccx) ** 2 + (yy - ccy) ** 2)
 m = np.clip((r * k - d) / 3.0, 0, 1) * 255
 logo = Image.fromarray(np.dstack([np.array(logo), m]).astype(np.uint8), "RGBA")
-logo = logo.resize((round(logo.width / k * SCALE), round(logo.height / k * SCALE)), Image.LANCZOS)
+# Salva em ~2x do tamanho de uso (o logo agora aparece grande, ~250px) + nitidez leve
+LOGO_OUT = 2.0
+logo = logo.resize((round(logo.width / k * SCALE * LOGO_OUT), round(logo.height / k * SCALE * LOGO_OUT)), Image.LANCZOS)
+rgb_l, a_l = logo.convert("RGB"), logo.getchannel("A")
+rgb_l = rgb_l.filter(ImageFilter.UnsharpMask(radius=2, percent=70, threshold=2))
+logo = Image.merge("RGBA", (*rgb_l.split(), a_l))
 logo.save(A / "logo.png", optimize=True)
 
 # --------------------------------------------------------- ifood-tag.png

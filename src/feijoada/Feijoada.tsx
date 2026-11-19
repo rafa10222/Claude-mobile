@@ -1,7 +1,10 @@
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { Background } from "./components/Background";
+import { GoldDust } from "./components/GoldDust";
+import { LightLeak } from "./components/LightLeak";
+import { Vignette } from "./components/Vignette";
 import { Bowl } from "./components/Bowl";
-import { Headline } from "./components/Headline";
+import { Headline, TITLE_LAND } from "./components/Headline";
 import { IfoodTag } from "./components/IfoodTag";
 import { LightDrift } from "./components/LightDrift";
 import { Logo } from "./components/Logo";
@@ -12,19 +15,24 @@ import "./fonts";
 
 export type FeijoadaProps = { showSafeZone: boolean };
 
-/** Frame em que a última letra de FEIJOADA assenta (dispara o shake). */
-export const LAST_LETTER_LAND = 79;
+/** Impactos de câmera: queda da última letra do FEIJOADA e a fita colando */
+const IMPACTS: { at: number; amp: number }[] = [
+  { at: TITLE_LAND, amp: 1 },
+  { at: 87, amp: 0.7 },
+];
+const SHAKE: [number, number][] = [
+  [3, -2],
+  [-2.5, 3],
+  [2, -1.5],
+  [-1, 1],
+];
 
-const cameraShake = (frame: number) => {
-  // 4 frames de tremida, 2–3px, amortecendo
-  const seq: [number, number][] = [
-    [3, -2],
-    [-2, 3],
-    [2, -1],
-    [-1, 1],
-  ];
-  const i = frame - LAST_LETTER_LAND;
-  return i >= 0 && i < seq.length ? seq[i] : [0, 0];
+const cameraShake = (frame: number): [number, number] => {
+  for (const { at, amp } of IMPACTS) {
+    const i = frame - at;
+    if (i >= 0 && i < SHAKE.length) return [SHAKE[i][0] * amp, SHAKE[i][1] * amp];
+  }
+  return [0, 0];
 };
 
 export const Feijoada: React.FC<FeijoadaProps & { variant: Variant }> = ({
@@ -50,6 +58,8 @@ export const Feijoada: React.FC<FeijoadaProps & { variant: Variant }> = ({
           <Bowl dx={L.bowl.dx} dy={L.bowl.dy} />
           <LightDrift />
         </AbsoluteFill>
+        <Vignette />
+        <GoldDust />
 
         {/* Informação: fora do push-in pra nunca sair da área segura */}
         <Logo top={L.logo.top} size={L.logo.size} />
@@ -76,6 +86,8 @@ export const Feijoada: React.FC<FeijoadaProps & { variant: Variant }> = ({
           pointerEvents: "none",
         }}
       />
+      {/* Light leak por cima do preto: a luz "acende" a cena */}
+      <LightLeak />
       {showSafeZone ? <SafeZoneOverlay variant={variant} /> : null}
     </AbsoluteFill>
   );

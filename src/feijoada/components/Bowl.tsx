@@ -1,5 +1,6 @@
 import { AbsoluteFill, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Steam } from "./Steam";
+import { DURATION, EASE_IN_OUT } from "../layout";
 
 /** Centro aproximado da tigela dentro de tigela.png (1080x1920) */
 export const BOWL_CENTER = { x: 1021, y: 1320 };
@@ -13,6 +14,11 @@ export const Bowl: React.FC<{ dx: number; dy: number }> = ({ dx, dy }) => {
   const enterX = interpolate(s, [0, 1], [600, 0]);
   // Gira no sentido anti-horário pra borda cortada da imagem nunca aparecer no quadro
   const enterRot = interpolate(s, [0, 1], [-25, 0]);
+  // Motion blur proporcional à velocidade da entrada
+  const sPrev = spring({ frame: frame - 7, fps, config: { damping: 14, stiffness: 120, mass: 1 } });
+  const blur = Math.min(9, Math.abs(s - sPrev) * 600 * 0.05);
+  // Parallax: tigela tem um push-in próprio um pouco mais forte que o fundo
+  const parallax = interpolate(frame, [0, DURATION], [1.04, 1], { easing: EASE_IN_OUT, extrapolateRight: "clamp" });
 
   // Vida (120+): tigela "respirando", ±1.5° num seno lento (2 ciclos até o frame 360)
   const breatheAmt = interpolate(frame, [120, 150], [0, 1], {
@@ -25,7 +31,7 @@ export const Bowl: React.FC<{ dx: number; dy: number }> = ({ dx, dy }) => {
     <AbsoluteFill
       style={{
         transformOrigin: `${BOWL_CENTER.x + dx}px ${BOWL_CENTER.y + dy}px`,
-        transform: `translate(${dx + enterX}px, ${dy}px) rotate(${enterRot + breathe}deg)`,
+        transform: `translate(${dx + enterX}px, ${dy}px) rotate(${enterRot + breathe}deg) scale(${parallax})`,
       }}
     >
       <Img
@@ -33,7 +39,7 @@ export const Bowl: React.FC<{ dx: number; dy: number }> = ({ dx, dy }) => {
         style={{
           width: "100%",
           height: "100%",
-          filter: "drop-shadow(-22px 30px 30px rgba(28, 8, 0, 0.55))",
+          filter: `drop-shadow(-22px 30px 30px rgba(28, 8, 0, 0.55))${blur > 0.2 ? ` blur(${blur}px)` : ""}`,
         }}
       />
       <Steam />

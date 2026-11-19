@@ -33,6 +33,9 @@ export const Tape: React.FC = () => {
   const scale = interpolate(s, [0, 1], [1.6, 1]);
   const rot = interpolate(s, [0, 1], [-8, -3]);
   const opacity = interpolate(frame, [80, 84], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  // impacto: flash de luz + achatada rápida quando cola
+  const flash = interpolate(frame, [83, 86, 96], [1, 1.45, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const squash = interpolate(frame, [84, 87, 93], [1, 0.9, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
     <div
@@ -43,7 +46,7 @@ export const Tape: React.FC = () => {
         width: TAPE.width,
         height: TAPE.height,
         opacity,
-        transform: `rotate(${rot}deg) scale(${scale})`,
+        transform: `rotate(${rot}deg) scale(${scale}) scaleY(${squash})`,
         filter: "drop-shadow(0 10px 12px rgba(30,10,0,0.45))",
       }}
     >
@@ -52,6 +55,7 @@ export const Tape: React.FC = () => {
           position: "absolute",
           inset: 0,
           clipPath: torn,
+          filter: `brightness(${flash})`,
           background: `linear-gradient(180deg, ${COLORS.tapeLight} 0%, ${COLORS.tape} 55%, #E2A03E 100%)`,
           display: "flex",
           alignItems: "center",
